@@ -1,14 +1,7 @@
-import LoginPage from './pages/LoginPage'
-import RegisterPage from './pages/RegisterPage'
+import AppRoutes from './routes/AppRoutes'
 
 function App() {
-  const pathname = window.location.pathname
-
-  if (pathname === '/register') {
-    return <RegisterPage />
-  }
-
-  return <LoginPage />
+  return <AppRoutes />
 }
 
 export default App

@@ -8,3 +8,78 @@ body {
 #root {
   min-height: 100vh;
 }
+
+@keyframes welcome-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-14px) rotate(2deg);
+  }
+}
+
+@keyframes welcome-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.welcome-page {
+  isolation: isolate;
+}
+
+.welcome-glow {
+  position: absolute;
+  z-index: -1;
+  width: 28rem;
+  height: 28rem;
+  border-radius: 9999px;
+  filter: blur(90px);
+  opacity: 0.18;
+}
+
+.welcome-glow-cyan {
+  top: 12%;
+  right: -10rem;
+  background: #22d3ee;
+}
+
+.welcome-glow-coral {
+  bottom: -14rem;
+  left: -10rem;
+  background: #fb7185;
+}
+
+.welcome-copy {
+  animation: welcome-float 7s ease-in-out infinite;
+}
+
+.welcome-orbit {
+  animation: welcome-float 8s ease-in-out -2s infinite;
+}
+
+.welcome-ring {
+  position: absolute;
+  inset: 8%;
+  border: 1px solid rgba(103, 232, 249, 0.25);
+  border-radius: 9999px;
+}
+
+.welcome-ring-outer {
+  animation: welcome-spin 24s linear infinite;
+  border-left-color: rgba(103, 232, 249, 0.8);
+}
+
+.welcome-ring-inner {
+  inset: 17%;
+  animation: welcome-spin 18s linear reverse infinite;
+  border-right-color: rgba(251, 113, 133, 0.75);
+}
+
+.welcome-note {
+  animation: welcome-float 6s ease-in-out -1s infinite;
+}

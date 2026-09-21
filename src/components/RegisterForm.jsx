@@ -27,7 +27,7 @@ function RegisterForm() {
           className="mb-2 block text-sm font-medium text-slate-800"
           htmlFor="register-email"
         >
-          Email address
+          Email Address
         </label>
         <input
           className="block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-3 text-slate-950 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100"
@@ -61,7 +61,7 @@ function RegisterForm() {
           className="mb-2 block text-sm font-medium text-slate-800"
           htmlFor="password-confirmation"
         >
-          Confirm password
+          Confirm Password
         </label>
         <input
           className="block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-3 text-slate-950 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100"
@@ -77,7 +77,7 @@ function RegisterForm() {
         className="w-full rounded-lg bg-slate-950 px-4 py-3 font-semibold text-white shadow-sm transition hover:bg-cyan-700 focus:outline-none focus:ring-4 focus:ring-cyan-200"
         type="submit"
       >
-        Create account
+        Create Account
       </button>
     </form>
   )

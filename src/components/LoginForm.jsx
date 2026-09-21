@@ -29,12 +29,12 @@ function LoginForm() {
           >
             Password
           </label>
-          <button
+          <a
             className="text-sm font-medium text-cyan-700 hover:text-cyan-900"
-            type="button"
+            href="/forgot-password"
           >
             Forgot password?
-          </button>
+          </a>
         </div>
         <input
           className="block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-3 text-slate-950 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100"

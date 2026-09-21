@@ -34,7 +34,7 @@ function RegisterPage() {
             Already have an account?{' '}
             <a
               className="font-semibold text-cyan-700 hover:text-cyan-900"
-              href="/signin"
+              href="/login"
             >
               Sign in
             </a>
