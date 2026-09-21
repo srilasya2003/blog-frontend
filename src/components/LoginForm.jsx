@@ -10,7 +10,7 @@ function LoginForm() {
           className="mb-2 block text-sm font-medium text-slate-800"
           htmlFor="email"
         >
-          Email address
+          Email address <span className="text-red-500">*</span>
         </label>
         <input
           className="block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-3 text-slate-950 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100"
@@ -27,7 +27,7 @@ function LoginForm() {
             className="block text-sm font-medium text-slate-800"
             htmlFor="password"
           >
-            Password
+            Password <span className="text-red-500">*</span>
           </label>
           <a
             className="text-sm font-medium text-cyan-700 hover:text-cyan-900"
