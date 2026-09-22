@@ -23,7 +23,7 @@ function Navbar() {
           <Link className="transition hover:text-slate-950" to="/home">
             Trending
           </Link>
-          <Link className="transition hover:text-slate-950" to="/home">
+          <Link className="transition hover:text-slate-950" to="/write">
             Write
           </Link>
         </div>
@@ -35,20 +35,21 @@ function Navbar() {
           >
             Search
           </button>
-          <button
+          <Link
             className="rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-cyan-700"
-            type="button"
+            to="/write"
           >
             Publish
-          </button>
+          </Link>
 
-          <button
+          <Link
             className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-sm font-semibold text-slate-700 transition hover:border-cyan-300 hover:text-cyan-700"
-            type="button"
             aria-label="Profile"
+            title="Profile"
+            to="/profile"
           >
             U
-          </button>
+          </Link>
         </div>
       </nav>
     </header>

@@ -4,6 +4,8 @@ import LoginPage from '../pages/LoginPage'
 import RegisterPage from '../pages/RegisterPage'
 import ForgotPasswordPage from '../pages/ForgotPassword'
 import HomePage from '../pages/HomePage'
+import WritePage from '../pages/WritePage'
+import ProfilePage from '../pages/ProfilePage'
 import NotFoundPage from '../pages/NotFoundPage'
 
 function AppRoutes() {
@@ -15,6 +17,8 @@ function AppRoutes() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/home" element={<HomePage />} />
+        <Route path="/write" element={<WritePage />} />
+        <Route path="/profile" element={<ProfilePage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
