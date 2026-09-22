@@ -53,14 +53,14 @@ function ProfilePage() {
                 <p className="font-semibold text-slate-950">2</p>
                 <p className="mt-1 text-slate-500">Posts</p>
               </div>
-              <div>
+              {/* <div>
                 <p className="font-semibold text-slate-950">24</p>
                 <p className="mt-1 text-slate-500">Followers</p>
               </div>
               <div>
                 <p className="font-semibold text-slate-950">18</p>
                 <p className="mt-1 text-slate-500">Following</p>
-              </div>
+              </div> */}
             </div>
           </div>
         </section>
