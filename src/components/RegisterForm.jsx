@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { registerUser } from '../api/client'
 import {
   validateRegisterField,
   validateRegisterForm,
@@ -68,17 +69,50 @@ function RegisterForm() {
     updateFieldError(name, value, nextFormData)
   }
 
-  function handleSubmit(event) {
+  const [submitStatus, setSubmitStatus] = useState({ type: '', message: '' })
+
+  async function handleSubmit(event) {
     event.preventDefault()
 
     const validationErrors = validateRegisterForm(formData)
     setErrors(validationErrors)
 
     if (Object.keys(validationErrors).length > 0) {
+      setSubmitStatus({ type: 'error', message: 'Please fix the highlighted fields and try again.' })
       return
     }
 
-    console.log('Registration submitted successfully', formData)
+    try {
+      setSubmitStatus({ type: 'loading', message: 'Creating your account...' })
+      await registerUser({
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+        password_confirmation: formData.password_confirmation,
+      })
+
+      setSubmitStatus({ type: 'success', message: 'Account created successfully.' })
+      setFormData({
+        username: '',
+        email: '',
+        password: '',
+        password_confirmation: '',
+      })
+      setErrors({})
+    } catch (error) {
+      const fieldErrors = Object.fromEntries(
+        Object.entries(error.fieldErrors || {}).map(([field, value]) => [
+          field,
+          Array.isArray(value) ? value[0] : value,
+        ]),
+      )
+
+      setErrors(fieldErrors)
+      setSubmitStatus({
+        type: 'error',
+        message: error.message || 'Unable to create account right now.',
+      })
+    }
   }
 
   function labelWithAsterisk(label, htmlFor) {
@@ -172,11 +206,26 @@ function RegisterForm() {
         )}
       </div>
 
+      {submitStatus.message && (
+        <p
+          className={`rounded-lg px-3 py-2 text-sm ${
+            submitStatus.type === 'success'
+              ? 'bg-emerald-50 text-emerald-700'
+              : submitStatus.type === 'error'
+                ? 'bg-red-50 text-red-700'
+                : 'bg-cyan-50 text-cyan-700'
+          }`}
+        >
+          {submitStatus.message}
+        </p>
+      )}
+
       <button
-        className="w-full rounded-lg bg-slate-950 px-4 py-3 font-semibold text-white shadow-sm transition hover:bg-cyan-700 focus:outline-none focus:ring-4 focus:ring-cyan-200"
+        className="w-full rounded-lg bg-slate-950 px-4 py-3 font-semibold text-white shadow-sm transition hover:bg-cyan-700 focus:outline-none focus:ring-4 focus:ring-cyan-200 disabled:cursor-not-allowed disabled:opacity-70"
+        disabled={submitStatus.type === 'loading'}
         type="submit"
       >
-        Create Account
+        {submitStatus.type === 'loading' ? 'Creating account...' : 'Create Account'}
       </button>
     </form>
   )

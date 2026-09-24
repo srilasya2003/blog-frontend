@@ -1,4 +1,6 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { fetchProfile } from '../api/client'
 import Navbar from '../components/Navbar'
 
 const myPosts = [
@@ -19,6 +21,22 @@ const myPosts = [
 ]
 
 function ProfilePage() {
+  const [profile, setProfile] = useState(null)
+  const [profileError, setProfileError] = useState('')
+
+  useEffect(() => {
+    async function loadProfile() {
+      try {
+        const profileData = await fetchProfile()
+        setProfile(profileData)
+      } catch (error) {
+        setProfileError(error.message || 'Unable to load your profile.')
+      }
+    }
+
+    loadProfile()
+  }, [])
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <Navbar />
@@ -34,9 +52,17 @@ function ProfilePage() {
                 </div>
                 <div className="pb-1">
                   <h1 className="text-2xl font-semibold tracking-tight text-slate-950">
-                    Your profile
+                    {profile?.username || 'Your profile'}
                   </h1>
-                  <p className="mt-1 text-sm text-slate-500">@yourusername</p>
+                  <p className="mt-1 text-sm text-slate-500">
+                    {profile ? `@${profile.username}` : 'Loading profile...'}
+                  </p>
+                  {profile?.email && (
+                    <p className="mt-1 text-sm text-slate-500">{profile.email}</p>
+                  )}
+                  {profileError && (
+                    <p className="mt-1 text-sm text-red-600">{profileError}</p>
+                  )}
                 </div>
               </div>
 

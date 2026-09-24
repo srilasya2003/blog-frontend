@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { createPost } from '../api/client'
 import Navbar from '../components/Navbar'
 
 function WritePage() {
@@ -47,7 +48,7 @@ function WritePage() {
 		}
 	}
 
-	function handleSubmit(event) {
+	async function handleSubmit(event) {
 		event.preventDefault()
 
 		if (!formData.title.trim() || !formData.category || !formData.content.trim()) {
@@ -55,7 +56,25 @@ function WritePage() {
 			return
 		}
 
-		setStatus('Your post is ready to connect to the publishing API.')
+		try {
+			setStatus('Publishing your story...')
+			const formPayload = new FormData()
+			formPayload.append('title', formData.title)
+			formPayload.append('category', formData.category)
+			formPayload.append('content', formData.content)
+
+			if (imageInputRef.current?.files?.[0]) {
+				formPayload.append('image', imageInputRef.current.files[0])
+			}
+
+			await createPost(formPayload)
+
+			setStatus('Story published successfully.')
+			setFormData({ title: '', category: '', content: '' })
+			removeImage()
+		} catch (error) {
+			setStatus(error.message || 'Could not publish your story right now.')
+		}
 	}
 
 	return (
