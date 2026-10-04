@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { registerUser } from '../api/client'
 import {
   validateRegisterField,
@@ -6,6 +7,7 @@ import {
 } from '../utils/registerValidation'
 
 function RegisterForm() {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -71,6 +73,15 @@ function RegisterForm() {
 
   const [submitStatus, setSubmitStatus] = useState({ type: '', message: '' })
 
+  useEffect(() => {
+    if (submitStatus.type !== 'success') {
+      return undefined
+    }
+
+    const redirectTimer = window.setTimeout(() => navigate('/login'), 5000)
+    return () => window.clearTimeout(redirectTimer)
+  }, [navigate, submitStatus.type])
+
   async function handleSubmit(event) {
     event.preventDefault()
 
@@ -91,7 +102,10 @@ function RegisterForm() {
         password_confirmation: formData.password_confirmation,
       })
 
-      setSubmitStatus({ type: 'success', message: 'Account created successfully.' })
+      setSubmitStatus({
+        type: 'success',
+        message: 'Account created successfully. Redirecting to login page...',
+      })
       setFormData({
         username: '',
         email: '',
