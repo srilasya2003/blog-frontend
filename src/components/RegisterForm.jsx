@@ -1,13 +1,11 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { registerUser } from '../api/client'
+import { registerUser, resendEmailVerification } from '../api/client'
 import {
   validateRegisterField,
   validateRegisterForm,
 } from '../utils/registerValidation'
 
 function RegisterForm() {
-  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -72,15 +70,20 @@ function RegisterForm() {
   }
 
   const [submitStatus, setSubmitStatus] = useState({ type: '', message: '' })
+  const [pendingEmail, setPendingEmail] = useState('')
+  const [resendStatus, setResendStatus] = useState({ type: '', message: '' })
+  const [resendCooldown, setResendCooldown] = useState(0)
 
   useEffect(() => {
-    if (submitStatus.type !== 'success') {
+    if (resendCooldown <= 0) {
       return undefined
     }
 
-    const redirectTimer = window.setTimeout(() => navigate('/login'), 5000)
-    return () => window.clearTimeout(redirectTimer)
-  }, [navigate, submitStatus.type])
+    const cooldownTimer = window.setTimeout(() => {
+      setResendCooldown((seconds) => Math.max(0, seconds - 1))
+    }, 1000)
+    return () => window.clearTimeout(cooldownTimer)
+  }, [resendCooldown])
 
   async function handleSubmit(event) {
     event.preventDefault()
@@ -102,9 +105,10 @@ function RegisterForm() {
         password_confirmation: formData.password_confirmation,
       })
 
+      setPendingEmail(formData.email.trim())
       setSubmitStatus({
         type: 'success',
-        message: 'Account created successfully. Redirecting to login page...',
+        message: 'Your account is created. Check your inbox for a verification link before signing in.',
       })
       setFormData({
         username: '',
@@ -129,6 +133,26 @@ function RegisterForm() {
     }
   }
 
+  async function handleResendVerification() {
+    try {
+      setResendStatus({ type: 'loading', message: 'Sending another verification link...' })
+      const response = await resendEmailVerification({ email: pendingEmail })
+      setResendStatus({
+        type: 'success',
+        message: response.message || 'If the account is awaiting verification, a new link has been sent.',
+      })
+      setResendCooldown(60)
+    } catch (error) {
+      setResendStatus({
+        type: 'error',
+        message: error.message || 'Unable to send another verification link right now.',
+      })
+      if (error.message?.toLowerCase().includes('minute')) {
+        setResendCooldown(60)
+      }
+    }
+  }
+
   function labelWithAsterisk(label, htmlFor) {
     return (
       <label
@@ -137,6 +161,48 @@ function RegisterForm() {
       >
         {label} <span className="text-red-500">*</span>
       </label>
+    )
+  }
+
+  if (pendingEmail) {
+    return (
+      <section className="mt-8" aria-live="polite">
+        <p className="rounded-lg bg-emerald-50 px-3 py-3 text-sm text-emerald-700">
+          {submitStatus.message}
+        </p>
+        <p className="mt-5 text-sm leading-6 text-slate-600">
+          Verification link sent to <strong className="break-all text-slate-900">{pendingEmail}</strong>.
+          Open it to activate your account.
+        </p>
+
+        {resendStatus.message && (
+          <p
+            className={`mt-4 rounded-lg px-3 py-2 text-sm ${
+              resendStatus.type === 'success'
+                ? 'bg-emerald-50 text-emerald-700'
+                : resendStatus.type === 'error'
+                  ? 'bg-red-50 text-red-700'
+                  : 'bg-cyan-50 text-cyan-700'
+            }`}
+            role={resendStatus.type === 'error' ? 'alert' : 'status'}
+          >
+            {resendStatus.message}
+          </p>
+        )}
+
+        <button
+          className="mt-6 w-full rounded-lg border border-slate-300 bg-white px-4 py-3 font-semibold text-slate-900 transition hover:border-cyan-600 hover:text-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-100 disabled:cursor-not-allowed disabled:opacity-60"
+          disabled={resendStatus.type === 'loading' || resendCooldown > 0}
+          onClick={handleResendVerification}
+          type="button"
+        >
+          {resendStatus.type === 'loading'
+            ? 'Sending...'
+            : resendCooldown > 0
+              ? `Resend available in ${resendCooldown}s`
+              : 'Resend verification email'}
+        </button>
+      </section>
     )
   }
 

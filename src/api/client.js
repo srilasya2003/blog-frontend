@@ -162,6 +162,20 @@ export async function registerUser(payload) {
   })
 }
 
+export async function confirmEmailVerification(payload) {
+  return apiRequest('/email-verification/confirm/', {
+    method: 'POST',
+    body: payload,
+  })
+}
+
+export async function resendEmailVerification(payload) {
+  return apiRequest('/email-verification/resend/', {
+    method: 'POST',
+    body: payload,
+  })
+}
+
 export async function loginUser(payload) {
   return apiRequest('/login/', {
     method: 'POST',

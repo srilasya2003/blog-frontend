@@ -4,6 +4,7 @@ import LoginPage from '../pages/LoginPage'
 import RegisterPage from '../pages/RegisterPage'
 import ForgotPasswordPage from '../pages/ForgotPassword'
 import ResetPasswordPage from '../pages/ResetPassword'
+import EmailVerificationPage from '../pages/EmailVerificationPage'
 import HomePage from '../pages/HomePage'
 import WritePage from '../pages/WritePage'
 import ProfilePage from '../pages/ProfilePage'
@@ -18,6 +19,7 @@ function AppRoutes() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password/:uid/:token" element={<ResetPasswordPage />} />
+        <Route path="/verify-email" element={<EmailVerificationPage />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/write" element={<WritePage />} />
         <Route path="/profile" element={<ProfilePage />} />
