@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { loginUser } from '../api/client'
 import { validateEmail } from '../utils/registerValidation'
@@ -7,7 +7,15 @@ function LoginForm() {
   const navigate = useNavigate()
   const [formData, setFormData] = useState({ email: '', password: '' })
   const [errors, setErrors] = useState({})
-  const [submitStatus, setSubmitStatus] = useState({ type: '', message: '' })
+  const [authMessage] = useState(() => sessionStorage.getItem('authMessage') || '')
+  const [submitStatus, setSubmitStatus] = useState({
+    type: authMessage ? 'error' : '',
+    message: authMessage,
+  })
+
+  useEffect(() => {
+    sessionStorage.removeItem('authMessage')
+  }, [])
 
   function handleChange(event) {
     const { name, value } = event.target
@@ -34,13 +42,11 @@ function LoginForm() {
 
     try {
       setSubmitStatus({ type: 'loading', message: 'Signing you in...' })
-      const response = await loginUser({
+      await loginUser({
         email: formData.email.trim(),
         password: formData.password,
       })
 
-      localStorage.setItem('accessToken', response.access)
-      localStorage.setItem('refreshToken', response.refresh)
       navigate('/home')
     } catch (error) {
       setSubmitStatus({

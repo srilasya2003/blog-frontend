@@ -1,8 +1,35 @@
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { requestPasswordReset } from '../api/client'
 import BrandPanel from '../components/BrandPanel'
+import { validateEmail } from '../utils/registerValidation'
 
 function ForgotPasswordPage() {
-  function handleSubmit(event) {
+  const [email, setEmail] = useState('')
+  const [error, setError] = useState('')
+  const [status, setStatus] = useState({ type: '', message: '' })
+
+  async function handleSubmit(event) {
     event.preventDefault()
+
+    const emailValidation = validateEmail(email)
+    if (!emailValidation.valid) {
+      setError(emailValidation.message)
+      setStatus({ type: '', message: '' })
+      return
+    }
+
+    try {
+      setError('')
+      setStatus({ type: 'loading', message: 'Sending reset link...' })
+      const response = await requestPasswordReset({ email: email.trim() })
+      setStatus({ type: 'success', message: response.message })
+    } catch (requestError) {
+      setStatus({
+        type: 'error',
+        message: requestError.message || 'Unable to send reset link.',
+      })
+    }
   }
 
   return (
@@ -43,27 +70,45 @@ function ForgotPasswordPage() {
                 className="block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-3 text-slate-950 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100"
                 id="reset-email"
                 name="email"
+                onChange={(event) => setEmail(event.target.value)}
                 placeholder="you@example.com"
                 type="email"
+                value={email}
               />
+              {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
             </div>
+
+            {status.message && (
+              <p
+                className={`rounded-lg px-3 py-2 text-sm ${
+                  status.type === 'success'
+                    ? 'bg-emerald-50 text-emerald-700'
+                    : status.type === 'error'
+                      ? 'bg-red-50 text-red-700'
+                      : 'bg-cyan-50 text-cyan-700'
+                }`}
+              >
+                {status.message}
+              </p>
+            )}
 
             <button
               className="w-full rounded-lg bg-slate-950 px-4 py-3 font-semibold text-white shadow-sm transition hover:bg-cyan-700 focus:outline-none focus:ring-4 focus:ring-cyan-200"
+              disabled={status.type === 'loading'}
               type="submit"
             >
-              Send reset link
+              {status.type === 'loading' ? 'Sending...' : 'Send reset link'}
             </button>
           </form>
 
           <p className="mt-8 text-center text-sm text-slate-500">
             Remembered your password?{' '}
-            <a
+            <Link
               className="font-semibold text-cyan-700 hover:text-cyan-900"
-              href="/login"
+              to="/login"
             >
               Back to sign in
-            </a>
+            </Link>
           </p>
         </div>
       </section>

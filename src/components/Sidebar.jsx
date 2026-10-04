@@ -1,6 +1,27 @@
-function Sidebar() {
+function Sidebar({ posts = [], writersLoading = false }) {
   const trending = ['Product thinking', 'Remote teams', 'Design systems', 'Writing rituals']
-  const writers = ['Aisha Shah', 'Lina Park', 'Marcus Lee', 'Nadia Cole']
+  const popularWriters = Array.from(
+    posts.reduce((writersById, post) => {
+      const authorId = post.author?.id ?? post.author
+      const authorName = post.author_name || post.author?.username
+
+      if (authorId === undefined || authorId === null || !authorName) {
+        return writersById
+      }
+
+      const key = String(authorId)
+      const writer = writersById.get(key) || {
+        id: key,
+        name: authorName,
+        postCount: 0,
+      }
+      writer.postCount += 1
+      writersById.set(key, writer)
+      return writersById
+    }, new Map()).values(),
+  )
+    .sort((first, second) => second.postCount - first.postCount)
+    .slice(0, 4)
 
   return (
     <aside className="space-y-6">
@@ -37,25 +58,30 @@ function Sidebar() {
       <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <h3 className="text-lg font-semibold text-slate-900">Popular writers</h3>
         <div className="mt-4 space-y-3">
-          {writers.map((writer) => (
-            <div key={writer} className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-200 text-xs font-semibold text-slate-700">
-                  {writer
-                    .split(' ')
-                    .map((name) => name[0])
-                    .join('')}
+          {writersLoading ? (
+            <p className="text-sm text-slate-500">Loading writers...</p>
+          ) : popularWriters.length > 0 ? (
+            popularWriters.map((writer) => (
+              <div key={writer.id} className="flex items-center justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-200 text-xs font-semibold text-slate-700">
+                    {writer.name
+                      .split(/\s+/)
+                      .map((name) => name[0])
+                      .join('')}
+                  </div>
+                  <span className="truncate text-sm font-medium text-slate-700">
+                    {writer.name}
+                  </span>
                 </div>
-                <span className="text-sm font-medium text-slate-700">{writer}</span>
+                <span className="shrink-0 text-xs text-slate-500">
+                  {writer.postCount} {writer.postCount === 1 ? 'post' : 'posts'}
+                </span>
               </div>
-              <button
-                className="text-xs font-semibold text-cyan-700 hover:text-cyan-900"
-                type="button"
-              >
-                Follow
-              </button>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p className="text-sm text-slate-500">No published writers yet.</p>
+          )}
         </div>
       </div>
     </aside>

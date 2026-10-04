@@ -17,24 +17,24 @@ function Navbar() {
           <Link className="transition hover:text-slate-950" to="/home">
             Home
           </Link>
-          <Link className="transition hover:text-slate-950" to="/home">
+          {/* <Link className="transition hover:text-slate-950" to="/home">
             Explore
           </Link>
           <Link className="transition hover:text-slate-950" to="/home">
             Trending
-          </Link>
+          </Link> */}
           <Link className="transition hover:text-slate-950" to="/write">
             Write
           </Link>
         </div>
 
         <div className="flex items-center gap-3">
-          <button
+          {/* <button
             className="hidden rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-cyan-300 hover:text-cyan-700 sm:inline-flex"
             type="button"
           >
             Search
-          </button>
+          </button> */}
           <Link
             className="rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-cyan-700"
             to="/write"

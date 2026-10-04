@@ -1,6 +1,6 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { createPost } from '../api/client'
+import { createPost, fetchCategories } from '../api/client'
 import Navbar from '../components/Navbar'
 
 function WritePage() {
@@ -12,7 +12,31 @@ function WritePage() {
 	const [imagePreview, setImagePreview] = useState('')
 	const [imageName, setImageName] = useState('')
 	const [status, setStatus] = useState('')
+	const [isSubmitting, setIsSubmitting] = useState(false)
+	const [categories, setCategories] = useState([])
+	const [categoryStatus, setCategoryStatus] = useState('loading')
 	const imageInputRef = useRef(null)
+
+	useEffect(() => {
+		let isActive = true
+
+		fetchCategories()
+			.then((categoryList) => {
+				if (isActive) {
+					setCategories(categoryList)
+					setCategoryStatus('loaded')
+				}
+			})
+			.catch(() => {
+				if (isActive) {
+					setCategoryStatus('error')
+				}
+			})
+
+		return () => {
+			isActive = false
+		}
+	}, [])
 
 	function handleChange(event) {
 		const { name, value } = event.target
@@ -48,20 +72,22 @@ function WritePage() {
 		}
 	}
 
-	async function handleSubmit(event) {
-		event.preventDefault()
+	async function handleSubmit(event, isPublished = true) {
+		event?.preventDefault()
 
 		if (!formData.title.trim() || !formData.category || !formData.content.trim()) {
-			setStatus('Add a title, category, and story before publishing.')
+			setStatus('Add a title, category, and story before saving.')
 			return
 		}
 
 		try {
-			setStatus('Publishing your story...')
+			setIsSubmitting(true)
+			setStatus(isPublished ? 'Publishing your story...' : 'Saving your draft...')
 			const formPayload = new FormData()
 			formPayload.append('title', formData.title)
 			formPayload.append('category', formData.category)
 			formPayload.append('content', formData.content)
+			formPayload.append('is_published', String(isPublished))
 
 			if (imageInputRef.current?.files?.[0]) {
 				formPayload.append('image', imageInputRef.current.files[0])
@@ -69,11 +95,13 @@ function WritePage() {
 
 			await createPost(formPayload)
 
-			setStatus('Story published successfully.')
 			setFormData({ title: '', category: '', content: '' })
 			removeImage()
+			setStatus(isPublished ? 'Story published successfully.' : 'Draft saved successfully.')
 		} catch (error) {
-			setStatus(error.message || 'Could not publish your story right now.')
+			setStatus(error.message || 'Could not save your story right now.')
+		} finally {
+			setIsSubmitting(false)
 		}
 	}
 
@@ -136,16 +164,30 @@ function WritePage() {
 										className="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 text-slate-950 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100"
 										id="post-category"
 										name="category"
+										disabled={categoryStatus !== 'loaded'}
 										onChange={handleChange}
 										value={formData.category}
 									>
-										<option value="">Choose a category</option>
-										<option value="design">Design</option>
-										<option value="technology">Technology</option>
-										<option value="writing">Writing</option>
-										<option value="product">Product</option>
-										<option value="culture">Culture</option>
+										<option value="">
+											{categoryStatus === 'loading'
+												? 'Loading categories...'
+												: categoryStatus === 'error'
+													? 'Categories could not be loaded'
+													: categories.length === 0
+														? 'No categories available'
+														: 'Choose a category'}
+										</option>
+										{categories.map((category) => (
+											<option key={category.id} value={category.id}>
+												{category.name}
+											</option>
+										))}
 									</select>
+									{categoryStatus === 'error' && (
+										<p className="mt-2 text-sm text-red-600" role="alert">
+											Could not load categories. Refresh the page and try again.
+										</p>
+									)}
 								</div>
 
 								<div>
@@ -185,13 +227,15 @@ function WritePage() {
 								<div className="flex flex-col gap-3 sm:flex-row">
 									<button
 										className="rounded-full border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-500 hover:text-slate-950"
+										disabled={isSubmitting}
+										onClick={() => handleSubmit(null, false)}
 										type="button"
-										onClick={() => setStatus('Draft saved locally for now.')}
 									>
 										Save draft
 									</button>
 									<button
-										className="rounded-full bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-cyan-700"
+										className="rounded-full bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-cyan-700 disabled:cursor-wait disabled:opacity-60"
+										disabled={isSubmitting}
 										type="submit"
 									>
 										Publish story

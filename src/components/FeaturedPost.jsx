@@ -1,4 +1,13 @@
-function FeaturedPost() {
+import { API_BASE_URL } from '../api/client'
+
+function FeaturedPost({ post, categoryName, onSelect }) {
+  const imageUrl = post.image
+    ? new URL(post.image, API_BASE_URL || window.location.origin).toString()
+    : ''
+  const publishedDate = post.created_at
+    ? new Date(post.created_at).toLocaleString()
+    : 'Time unavailable'
+
   return (
     <article className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
       <div className="grid gap-0 lg:grid-cols-[1.2fr_0.8fr]">
@@ -8,13 +17,12 @@ function FeaturedPost() {
             Featured story
           </div>
 
-          <p className="text-sm text-slate-300">Design • 7 min read</p>
+          <p className="text-sm text-slate-300">{categoryName || 'Story'}</p>
           <h2 className="mt-4 max-w-lg text-3xl font-semibold leading-tight tracking-tight text-white sm:text-4xl">
-            Why better interfaces feel calm, not crowded.
+            {post.title}
           </h2>
           <p className="mt-4 max-w-xl text-base leading-7 text-slate-300">
-            Thoughtful design isn’t about adding more; it’s about making every
-            decision clearer, lighter, and easier to trust.
+            {post.content}
           </p>
 
           <div className="mt-6 flex items-center gap-4">
@@ -22,21 +30,31 @@ function FeaturedPost() {
               AS
             </div>
             <div>
-              <p className="text-sm font-medium text-white">Aisha Shah</p>
-              <p className="text-xs text-slate-300">May 14, 2026</p>
+              <p className="text-sm font-medium text-white">
+                {post.author_name || 'Unknown author'}
+              </p>
+              <p className="text-xs text-slate-300">{publishedDate}</p>
             </div>
           </div>
+          <button
+            className="mt-6 rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-100"
+            onClick={() => onSelect(post)}
+            type="button"
+          >
+            Open post
+          </button>
         </div>
 
-        <div className="flex items-center justify-center bg-slate-50 p-6">
-          <div className="w-full rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <div className="mb-4 h-44 rounded-2xl bg-[linear-gradient(135deg,#cffafe,#dbeafe,#f8fafc)]" />
-            <div className="space-y-3">
-              <div className="h-3 w-2/3 rounded-full bg-slate-200" />
-              <div className="h-3 w-1/2 rounded-full bg-slate-200" />
-              <div className="h-3 w-3/4 rounded-full bg-slate-200" />
-            </div>
-          </div>
+        <div className="flex min-h-64 items-center justify-center bg-slate-50 p-6">
+          {imageUrl ? (
+            <img
+              alt={post.title}
+              className="h-64 w-full rounded-2xl object-cover"
+              src={imageUrl}
+            />
+          ) : (
+            <div className="h-64 w-full rounded-2xl bg-[linear-gradient(135deg,#cffafe,#dbeafe,#f8fafc)]" />
+          )}
         </div>
       </div>
     </article>
